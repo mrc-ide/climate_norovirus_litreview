@@ -1,3 +1,5 @@
+# this script is for processing and plotting extracted D-values by individual climate variables
+
 library(dplyr)
 library(ggplot2)
 library(openxlsx)
@@ -716,3 +718,4 @@ ggsave(paste0("figures_data/summary_figures/radiance_liquid_predicted", ".png"),
 
 
                                               
+
