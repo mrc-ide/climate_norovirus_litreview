@@ -1,4 +1,4 @@
-install.packages("openxlsx")
+# this script is for producing brief summary statistics as outlined below
 
 library(dplyr)
 library(ggplot2)
