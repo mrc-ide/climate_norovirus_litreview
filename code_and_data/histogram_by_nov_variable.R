@@ -1,3 +1,5 @@
+# this script is for plotting histograms by type of norovirus model and type of study
+
 library(dplyr)
 library(ggplot2)
 library(openxlsx)
@@ -38,7 +40,5 @@ plot <- ggplot(count, aes(x=norovirus_types_cleaned_3, y=count)) +
 plot
 
 ggsave("figures_data/studies_by_norovirus_types_cleaned_3.png", height = 10, width = 12)
-
-
 
 
