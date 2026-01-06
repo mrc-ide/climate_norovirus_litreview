@@ -1,3 +1,5 @@
+# This script is for plotting a histogram with number of studies by year and a map with number of studies by country
+
 library(dplyr)
 library(ggplot2)
 library(CoordinateCleaner)
@@ -95,4 +97,5 @@ g_world
 ggsave("figures_data/studies_by_country.png", height = 10, width = 12)
 
 world_map %>% ungroup() %>% select(region, study_count) %>% unique() %>% write.csv("figures_data/by_country_count.csv", row.names = FALSE)
+
 
