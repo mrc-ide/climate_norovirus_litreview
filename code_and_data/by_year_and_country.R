@@ -1,8 +1,3 @@
-install.packages('CoordinateCleaner')
-install.packages('countrycode')
-install.packages('ggrepel')
-install.packages('MetBrewer')
-
 library(dplyr)
 library(ggplot2)
 library(CoordinateCleaner)
@@ -11,16 +6,17 @@ library(ggrepel)
 library(MetBrewer)
 library(scales)
 
-#read data
+# read data
 df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Data General")
 
+# remove pH due to this climate variables being excluded in the systematic review
 df <- filter(df, environmental_variables != "pH")
 
-#read data for multi-country studies
+# read data for multi-country studies (breakdown by country is essential for mapping)
 df_multi <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Breakdown of Multicountry")
 
 #================================================================================================================
-#quick plot of studies by year
+# quick plot of studies by year
 
 df %>%
   group_by(year_of_article) %>%
@@ -38,19 +34,19 @@ df %>%
 ggsave("figures_data/studies_by_year.png", height = 10, width = 12)
 
 #================================================================================================================
-# quick plot of studies by country
+# quick map of studies by country
 
-#get world map
+# get world map
 world_map <- map_data("world")
 
-#plot background
+# plot background
 map_bg <- ggplot() +
   geom_polygon(data = world_map, aes(x=long, y = lat, group = group),
                fill="grey") +
   coord_quickmap(ylim = c(-51, 70)) +
   theme_void()
 
-# #get midpoints of countries in case it is handy later
+# # get midpoints of countries in case it is handy later
 # countries <- CoordinateCleaner::countryref
 #
 # countries <- countries %>% select(name, iso3, centroid.lon, centroid.lat) %>%
@@ -76,7 +72,7 @@ world_map <- world_map %>% mutate(continent = countrycode::countrycode(sourcevar
                                                                        origin = "country.name",
                                                                        destination = "continent"))
 
-#add study count
+# add study count
 world_map <- world_map %>%
   group_by(region) %>%
   mutate(study_count = length(na.omit(unique(covidence_id)))) %>%
@@ -99,3 +95,4 @@ g_world
 ggsave("figures_data/studies_by_country.png", height = 10, width = 12)
 
 world_map %>% ungroup() %>% select(region, study_count) %>% unique() %>% write.csv("figures_data/by_country_count.csv", row.names = FALSE)
+
