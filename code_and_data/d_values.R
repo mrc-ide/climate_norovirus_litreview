@@ -1,10 +1,3 @@
-install.packages("plan")
-install.packages("ggh4x")
-install.packages("mltools")
-install.packages("gratia")
-install.packages("effects")
-install.packages("ggeffects")
-
 library(dplyr)
 library(ggplot2)
 library(openxlsx)
@@ -22,15 +15,17 @@ library(effects)
 library(ggeffects)
 library(patchwork)
 
-#read data
+# read data and select one relevant sheet by uncommeting the command line if plotting for mediums that are (1) fomites, (2) liquid, (3) food
 # df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Lab_Fomites")
-df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Lab_Liquid")
+# df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Lab_Liquid")
 # df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Lab_Food_Chain")
 
-#############
-#############
+# Plotting and processing is for each climate variable separately
 
+#############
+#############
 # Temperature
+# this subsection runs for fomites, liquid and food mediums. At the end of the subsection, plot only with the commands applicable to the selected medium
 
 data <- filter(df, environmental_variables_cleaned == "temperature" & !is.na(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`)) %>% select(covidence_id, setting, laboratory_methods, `data (temp/humidity/others)(times)(time_unit)(measurement_log_reduction)`, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, norovirus_types_cleaned_3)
 
@@ -106,6 +101,8 @@ data <- mutate(data, assay_type = case_when(
   laboratory_methods == "plaque assay" | laboratory_methods == "TCID50" | laboratory_methods == "human intestinal enteroids assay" | laboratory_methods == "human intestinal enteroid assay" | laboratory_methods == "human intestinal enteroid assay coupled to RT-qPCR" ~ "Infectivity Assay",
   laboratory_methods == "RT-qPCR" | laboratory_methods == "molecular beacon NASBA technique with enzymatic treatment" | laboratory_methods == "long-template RT-PCR" | laboratory_methods == "short genome RT-qPCR" | laboratory_methods == "ddRT-PCR" | laboratory_methods == "RT-ddPCR" | laboratory_methods == "long-genome RT-qPCR" | laboratory_methods == "enzyme treatment RT-qPCR" | laboratory_methods == "intact capsid (enzymatic pretreatment) RT-qPCR" | laboratory_methods == "enzymatic treatment RT-qPCR" ~ "Molecular Assay"))
 
+# If necessary, select alternative groupings from below while commenting out the grouping from above
+
 # data <- mutate(data, new_assay_type = case_when(
 #   laboratory_methods == "plaque assay" | laboratory_methods == "TCID50"  ~ "Infectivity Assay",
 #   laboratory_methods == "human intestinal enteroids assay" | laboratory_methods == "human intestinal enteroid assay" | laboratory_methods == "human intestinal enteroid assay coupled to RT-qPCR" ~ "Enteroid Assay",
@@ -116,9 +113,6 @@ data <- mutate(data, assay_type = case_when(
 #   laboratory_methods == "RT-qPCR" | laboratory_methods == "long-template RT-PCR" | laboratory_methods == "short genome RT-qPCR" | laboratory_methods == "ddRT-PCR" | laboratory_methods == "RT-ddPCR" | laboratory_methods == "long-genome RT-qPCR" ~ "Molecular Assay",
 #   laboratory_methods == "molecular beacon NASBA technique with enzymatic treatment" | laboratory_methods == "enzyme treatment RT-qPCR" | laboratory_methods == "intact capsid (enzymatic pretreatment) RT-qPCR" | laboratory_methods == "enzymatic treatment RT-qPCR" ~ "Enzymatic Treatment Molecular Assay"))
 
-data <- mutate(data, setting = case_when(
-  setting == "stainless steel surface" ~ "stainless steel",
-  TRUE ~ setting))
 
 data_new <- mutate(data, D_value = case_when(
       time_units == "weeks" ~ D_value * 7,
@@ -126,17 +120,6 @@ data_new <- mutate(data, D_value = case_when(
       time_units == "hours" ~ D_value/24,
       time_units == "minutes" ~ D_value/(24*60),
       time_units == "seconds" ~ D_value/(24*60*60)))
-# data_new <- mutate(data_new, relative_humidity_concomitant = as.numeric(relative_humidity_concomitant))
-
-# plot <- ggplot(data_new, aes(x = temp, y = D_value, colour = setting, group = `relative humidity`, shape = laboratory_methods)) +
-#         geom_point(size=2) +
-#         xlab("Temperature (oC)") + ylab("Standardised D-value (minutes)") +
-#         facet_wrap(~norovirus_types_cleaned_3, scales = "free_y") +
-#         scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-#                       labels = trans_format("log10", math_format(10^.x)))
-# plot
-# 
-# ggsave(paste0("figures_data/summary_figures/temperature_fomites_2", ".png"), plot = plot, height = 7, width = 14)
 
 data_new <- filter(data_new, D_value > 0)
 
@@ -158,12 +141,17 @@ data_new <- mutate(data_new, temp_box = case_when(
 
 data_new$temp_box <- factor(data_new$temp_box , levels=c("<= 0", "1 - 10", "11 - 20", "21 - 30", "31 - 40", "41 - 50", "51 - 60", "61 - 70", "71 - 80", "81 - 90", "91 - 100", "> 101"))
 
+#####################################
+# Run this when fomites were selected 
+
+data_new <- mutate(data_new, setting = case_when(
+              setting == "stainless steel surface" ~ "stainless steel",
+              TRUE ~ setting))
 
 summary <- data_new %>% group_by(assay_type, temp_box) %>% summarize(mean = mean(D_value))
 
 summary <- data_new %>% group_by(assay_type, temp_box) %>% summarize(mean_good = mean(D_value[norovirus_types_cleaned_3 == "NoVGI" | norovirus_types_cleaned_3 == "NoVGII"]), 
                                                                                       mean_other = mean(D_value[norovirus_types_cleaned_3 != "NoVGI" & norovirus_types_cleaned_3 != "NoVGII"]))
-
 
 plot <- ggplot(data_new, aes(x=as.factor(temp_box), y = D_value, fill = assay_type)) + 
         theme_minimal() +
@@ -175,13 +163,11 @@ plot <- ggplot(data_new, aes(x=as.factor(temp_box), y = D_value, fill = assay_ty
 
 plot
 
-# # final plot arrangement
-# plot <- plot + plot_annotation(title = "Figure 3. Impact of Temperature on Virus D-values on Fomites") & theme(plot.title = element_text(size = 18))
-# 
-# plot
-
 ggsave(paste0("figures_data/summary_figures/temperature_fomites_predicted", ".png"), plot = plot, height = 7, width = 14)
 
+############################################                                                   
+# Run this when liquid mediums were selected 
+                                                    
 data_new <- mutate(data_new, setting_new_type = case_when(
   setting == "processed tap water" ~ "laboratory solutions and tap water",
   setting == "culture medium" ~ "laboratory solutions and tap water",
@@ -216,6 +202,9 @@ plot
 
 ggsave(paste0("figures_data/summary_figures/temperature_liquid_predicted", ".png"), plot = plot, height = 7, width = 14)
 
+##########################################                                              
+# Run this when food mediums were selected 
+                                              
 data_new <- mutate(data_new, setting_new_type = case_when(
   setting == "turkey deli meat" ~ "oysters and turkey meat",
   setting == "strawberry surface" ~ "vegetables and fruits",
@@ -248,79 +237,11 @@ plot
 
 ggsave(paste0("figures_data/summary_figures/temperature_food_predicted", ".png"), plot = plot, height = 7, width = 14)
 
-
-# # data_new <- mutate(data_new, laboratory_methods = case_when(laboratory_methods == "plaque assay" ~ "plaque_assay",
-# #                                                             laboratory_methods == "RT-qPCR" ~ "RT_qPCR",
-# #                                                             laboratory_methods == "binding assay" ~ "binding_assay",
-# #                                                             laboratory_methods == "molecular beacon NASBA technique with enzymatic treatment" ~ "molecular_beacon_NASBA_technique_with_enzymatic_treatment",
-# #                                                             TRUE ~ laboratory_methods))
-# # 
-# # data_new$laboratory_methods <- as.factor(data_new$laboratory_methods)
-# # 
-# # one_hot_table <- one_hot(as.data.table(data_new)) 
-# 
-# glm_temp <- glm(D_value ~ temp, data = data_new)
-# 
-# 
-# summary(glm_temp)
-# AIC(glm_temp)
-# coef(glm_temp)
-# coef(summary(glm_temp))
-# 
-# p_value <- round(coef(summary(glm_temp))[,4][2], digits = 5)
-# if (p_value == 0){p_value = "<0.00001"}
-# 
-# 
-# pred.mm <- ggpredict(glm_temp, terms = c("temp"))  # this gives overall predictions for the model
-# 
-# (ggplot() + 
-#     geom_point(aes(x = data_new$temp, y = data_new$D_value, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting))) +
-#     geom_line(aes(x = pred.mm$x, y = pred.mm$predicted)) +          # slope
-#     geom_ribbon(aes(x = pred.mm$x, ymin = pred.mm$predicted - pred.mm$std.error*1.96, ymax = pred.mm$predicted + pred.mm$std.error*1.96), 
-#                 fill = "lightgrey", alpha = 0.5) +  # error band
-#     labs(x = "Temperature", y = "D-value (minutes)", 
-#          title = "Predicted D-value with Temperature", colour = "Fomite Type") + 
-#     theme_minimal()  + annotate("text", label=paste0("p value = ", p_value), x=Inf, y=Inf, hjust = 1.5, vjust = 4)
-# )
-# 
-# 
-# gam_temp <- gam(D_value ~ s(temp, bs = "cr", k = 1), data = data_new)
-# # gam_temp <- gam(D_value ~ s(temp, bs = "cr", k = 5) + s(relative_humidity_concomitant, bs = "cr", k = 4), data = data_new)
-# 
-# p_value <- round(summary(gam_temp)$s.table[4], digits = 5)
-# if (p_value == 0){p_value = "<0.00001"}
-# 
-# summary(gam_temp)
-# AIC(gam_temp)
-# 
-# pred.mm <- ggpredict(gam_temp, terms = c("temp"))  # this gives overall predictions for the model
-# 
-# plot <- ggplot() + 
-#         geom_point(aes(x = data_new$temp, y = data_new$D_value, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-#         geom_line(aes(x = pred.mm$x, y = pred.mm$predicted), linewidth = 0.8) +          # slope
-#         geom_ribbon(aes(x = pred.mm$x, ymin = pred.mm$predicted - pred.mm$std.error*1.96, ymax = pred.mm$predicted + pred.mm$std.error*1.96), 
-#                     fill = "lightgrey", alpha = 0.5) +  # error band
-#         labs(x = "Temperature", y = "Standardised D-value (days)", 
-#              title = "Temperature-dependent D-values deducted from Infectivity Assays", colour = "Fomite Type") + 
-#         theme_minimal() +
-#         # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-#         #               labels = trans_format("log10", math_format(10^.x))) +
-#         theme(text = element_text(size = 13)) +
-#         theme_minimal()  + annotate("text", label=paste0("p value = ", p_value), x=Inf, y=Inf, hjust = 1.5, vjust = 4)
-# 
-# plot
-# 
-# # ggsave(paste0("figures_data/summary_figures/temperature_fomites_infectivity_predicted", ".png"), plot = plot, height = 7, width = 14)
-# ggsave(paste0("figures_data/summary_figures/temperature_fomites_molecular_predicted", ".png"), plot = plot, height = 7, width = 14)
-# 
-# # plot(ggeffects::ggpredict(gam_temp), facets = TRUE)
-# # gratia::draw(gam_temp)
-
-
 ###################
 ###################
 # Relative Humidity
-
+# this climate variable is applicable only for fomites. No sufficient data was available for plotting for liquid and food mediums
+                                              
 data <- filter(df, environmental_variables_cleaned == "relative humidity" & !is.na(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`)) %>% select(covidence_id, setting, laboratory_methods, `data (temp/humidity/others)(times)(time_unit)(measurement_log_reduction)`, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, norovirus_types_cleaned_3, temperature_concomitant)
 
 data <- mutate(data, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)` = strsplit(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, ","))
@@ -388,9 +309,6 @@ data <- mutate(data, lower_D = as.numeric(gsub('\\)', '', lower_D)))
 data <- mutate(data, higher_D = as.numeric(gsub('\\)', '', higher_D)))
 data <- mutate(data, temperature_concomitant = as.numeric(temperature_concomitant))
 
-# data <- filter(data, laboratory_methods == "plaque assay" | laboratory_methods == "binding assay")
-# data <- filter(data, laboratory_methods == "RT-qPCR" | laboratory_methods == "molecular beacon NASBA technique with enzymatic treatment")
-
 data <- mutate(data, assay_type = case_when(
   laboratory_methods == "plaque assay" | laboratory_methods == "binding assay" ~ "Infectivity Assay",
   laboratory_methods == "RT-qPCR" | laboratory_methods == "molecular beacon NASBA technique with enzymatic treatment" ~ "Molecular Assay"))
@@ -405,23 +323,6 @@ data_new <- mutate(data, D_value = case_when(
   time_units == "hours" ~ D_value/24,
   time_units == "minutes" ~ D_value/(60*24),
   time_units == "seconds" ~ D_value/(60*60*24)))
-
-# plot <- ggplot(data_new, aes(x = relative_humidity, y = D_value, colour = setting, shape = laboratory_methods)) +
-#   geom_point(size=2) +
-#   xlab("Relative Humidity (%)") + ylab("Standardised D-value (minutes)") +
-#   facet_wrap(~norovirus_types_cleaned_3, scales = "free_y") +
-#   scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-#                 labels = trans_format("log10", math_format(10^.x)))
-# plot
-# 
-# ggsave(paste0("figures_data/summary_figures/relative_humidity_fomites_3", ".png"), plot = plot, height = 7, width = 14)
-
-
-# data_new <- mutate(data_new, laboratory_methods = case_when(laboratory_methods == "plaque assay" ~ "plaque_assay",
-#                                                             laboratory_methods == "RT-qPCR" ~ "RT_qPCR",
-#                                                             laboratory_methods == "binding assay" ~ "binding_assay",
-#                                                             laboratory_methods == "molecular beacon NASBA technique with enzymatic treatment" ~ "molecular_beacon_NASBA_technique_with_enzymatic_treatment",
-#                                                             TRUE ~ laboratory_methods))
 
 data_new <- filter(data_new, D_value > 0)
 
@@ -448,75 +349,13 @@ plot <- ggplot(data_new, aes(x=as.factor(relative_humidity_box), y = D_value, fi
 
 plot
 
-# final plot arrangement
-# plot <- plot + plot_annotation(title = "Figure 4. Impact of Relative Humidity on Virus D-values on Fomites") & theme(plot.title = element_text(size = 18))
-
-plot
-
 ggsave(paste0("figures_data/summary_figures/relative_humidity_fomites_predicted", ".png"), plot = plot, height = 7, width = 14)
-
-# # data_new$laboratory_methods <- as.factor(data_new$laboratory_methods)
-# # one_hot_table <- one_hot(as.data.table(data_new)) 
-# 
-# glm_RH <- glm(D_value ~ relative_humidity, data = data_new)
-# 
-# 
-# AIC(glm_RH)
-# 
-# p_value <- round(coef(summary(glm_RH))[,4][2], digits = 5)
-# if (p_value == 0){p_value = "<0.00001"}
-# 
-# 
-# pred.mm <- ggpredict(glm_RH, terms = c("relative_humidity"))  # this gives overall predictions for the model
-# 
-# (ggplot() + 
-#     geom_point(aes(x = data_new$relative_humidity, y = data_new$D_value, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting))) +
-#     geom_line(aes(x = pred.mm$x, y = pred.mm$predicted)) +          # slope
-#     geom_ribbon(aes(x = pred.mm$x, ymin = pred.mm$predicted - pred.mm$std.error*1.96, ymax = pred.mm$predicted + pred.mm$std.error*1.96), 
-#                 fill = "lightgrey", alpha = 0.5) +  # error band
-#     labs(x = "Relative Humidity (%)", y = "Predicted D-value (days)", 
-#          title = "Predicted D-value with Relative Humidity", colour = "Fomite Type") + 
-#     theme_minimal() + annotate("text", label=paste0("p value = ", p_value), x=Inf, y=Inf, hjust = 1.5, vjust = 4)
-# )
-# 
-# # plot(allEffects(glm_RH))
-# 
-# # + laboratory_methods_plaque_assay + laboratory_methods_RT_qPCR + laboratory_methods_binding_assay + laboratory_methods_molecular_beacon_NASBA_technique_with_enzymatic_treatment
-# gam_RH <- gam(D_value ~ s(relative_humidity, bs = "cr", k = 1), data = data_new)
-# 
-# AIC(gam_RH)
-# summary(gam_RH)
-# 
-# p_value <- round(summary(gam_RH)$s.table[4], digits = 5)
-# if (p_value == 0){p_value = "<0.00001"}
-# 
-# pred.mm <- ggpredict(gam_RH, terms = c("relative_humidity"))  # this gives overall predictions for the model
-# 
-# plot <- ggplot() + 
-#         geom_point(aes(x = data_new$relative_humidity, y = data_new$D_value, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-#         geom_line(aes(x = pred.mm$x, y = pred.mm$predicted), linewidth = 0.8) +          # slope
-#         geom_ribbon(aes(x = pred.mm$x, ymin = pred.mm$predicted - pred.mm$std.error*1.96, ymax = pred.mm$predicted + pred.mm$std.error*1.96), 
-#                     fill = "lightgrey", alpha = 0.5) +  # error band
-#         labs(x = "Relative Humidity (%)", y = "Standardised D-value (days)", 
-#              title = "Relative humidity-dependent D-values deducted from Molecular Assays", colour = "Fomite Type") + 
-#         theme_minimal() +
-#         # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-#         #               labels = trans_format("log10", math_format(10^.x))) +
-#         theme(text = element_text(size = 13)) + annotate("text", label=paste0("p value = ", p_value), x=Inf, y=Inf, hjust = 1.5, vjust = 4)
-# 
-# plot
-# 
-# # ggsave(paste0("figures_data/summary_figures/relative_humidity_fomites_infectivity_predicted", ".png"), plot = plot, height = 7, width = 14)
-# ggsave(paste0("figures_data/summary_figures/relative_humidity_fomites_molecular_predicted", ".png"), plot = plot, height = 7, width = 14)
-# 
-# plot(ggeffects::ggpredict(gam_RH), facets = TRUE)
-# gratia::draw(gam_RH)
-
 
 ########################
 ########################
 # UV wavelength and dose
-
+# applicable to fomite and liquid mediums
+                                              
 data <- filter(df, environmental_variables_cleaned == "UV dose" & !is.na(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`)) %>% select(covidence_id, setting, laboratory_methods, `data (temp/humidity/others)(times)(time_unit)(measurement_log_reduction)`, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, norovirus_types_cleaned_3)
 
 data <- mutate(data, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)` = strsplit(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, ","))
@@ -583,9 +422,6 @@ data <- mutate(data, D_value = as.numeric(gsub('\\)', '', D_value)))
 data <- mutate(data, lower_D = as.numeric(gsub('\\)', '', lower_D)))
 data <- mutate(data, higher_D = as.numeric(gsub('\\)', '', higher_D)))
 
-# data <- filter(data, laboratory_methods == "plaque assay")
-# data <- filter(data, laboratory_methods == "RT-qPCR" | laboratory_methods == "enzymatic treatment RT-qPCR")
-
 data <- mutate(data, assay_type = case_when(
   laboratory_methods == "plaque assay" | laboratory_methods == "TCID50" | laboratory_methods == "Zebrafish assay and RT-qPCR" | laboratory_methods == "integrated cell culture RT-qPCR" ~ "Infectivity Assay",
   laboratory_methods == "RT-qPCR" | laboratory_methods == "enzymatic treatment RT-qPCR" | laboratory_methods == "pre-treatment" ~ "Molecular Assay"))
@@ -610,6 +446,9 @@ data_new <- mutate(data_new, UV_wavelength_box = case_when(
 
 data_new$UV_wavelength_box <- factor(data_new$UV_wavelength_box , levels=c("220", "254", "260", "265", "279", "280", "280-315", "315-400"))
 
+##############################################
+# run this subsection for plotting for fomites
+                                              
 plot <- ggplot(data_new, aes(x=as.factor(UV_wavelength_box), y = D_value, fill = assay_type)) + 
   theme_minimal() +
   geom_boxplot() + 
@@ -622,7 +461,9 @@ plot
 
 ggsave(paste0("figures_data/summary_figures/UV_wavelength_fomites_predicted", ".png"), plot = plot, height = 7, width = 14)
 
-
+#####################################################
+# run this subsection for plotting for liquid mediums
+                                              
 data_new <- mutate(data_new, setting_new_type = case_when(
   setting == "processed tap water" ~ "laboratory solutions and tap water",
   setting == "culture medium" ~ "laboratory solutions and tap water",
@@ -658,74 +499,14 @@ plot
 
 summary <- data_new %>% group_by(assay_type, UV_wavelength_box, norovirus_types_cleaned_3) %>% summarize(mean = mean(D_value))
 
-# plot <- plot + plot_annotation(title = "Figure 6. Impact of Ultraviolet Light Wavelengths on Virus D10-values in Liquid Solutions") & theme(plot.title = element_text(size = 18))
-# 
-# plot
-
-
 ggsave(paste0("figures_data/summary_figures/UV_wavelength_liquid_predicted", ".png"), plot = plot, height = 7, width = 14)
-
-
-# # data_new$laboratory_methods <- as.factor(data_new$laboratory_methods)
-# # one_hot_table <- one_hot(as.data.table(data_new)) 
-# 
-# glm_UV <- glm(D_value ~ UV_wavelength, data = data_new)
-# 
-# AIC(glm_UV)
-# summary(glm_UV)
-# 
-# p_value <- round(coef(summary(glm_UV))[,4][2], digits = 5)
-# if (p_value == 0){p_value = "<0.00001"}
-# 
-# pred.mm <- ggpredict(glm_UV, terms = c("UV_wavelength"))  # this gives overall predictions for the model
-# 
-# (ggplot() + 
-#     geom_point(aes(x = data_new$UV_wavelength, y = data_new$D_value, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting))) +
-#     geom_line(aes(x = pred.mm$x, y = pred.mm$predicted)) +          # slope
-#     geom_ribbon(aes(x = pred.mm$x, ymin = pred.mm$predicted - pred.mm$std.error*1.96, ymax = pred.mm$predicted + pred.mm$std.error*1.96), 
-#                 fill = "lightgrey", alpha = 0.5) +  # error band
-#     labs(x = "Wavelength (nm)", y = "Predicted D10-value (mJ/cm2)", 
-#          title = "Predicted D10-value with UV Wavelength", colour = "Fomite Type") + 
-#     theme_minimal() + annotate("text", label=paste0("p value = ", p_value), x=Inf, y=Inf, hjust = 1.5, vjust = 4)
-# )
-# 
-# # plot(allEffects(glm_RH))
-# 
-# # + laboratory_methods_plaque_assay + laboratory_methods_RT_qPCR + laboratory_methods_binding_assay + laboratory_methods_molecular_beacon_NASBA_technique_with_enzymatic_treatment
-# gam_UV <- gam(D_value ~ s(UV_wavelength, bs = "cr", k = 1), data = data_new)
-# 
-# AIC(gam_UV)
-# summary(gam_UV)
-# 
-# p_value <- round(summary(gam_UV)$s.table[4], digits = 5)
-# if (p_value == 0){p_value = "<0.00001"}
-# 
-# pred.mm <- ggpredict(gam_UV, terms = c("UV_wavelength"))  # this gives overall predictions for the model
-# 
-# plot <- ggplot() + 
-#   geom_point(aes(x = data_new$UV_wavelength, y = data_new$D_value, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-#   geom_line(aes(x = pred.mm$x, y = pred.mm$predicted), linewidth = 0.8) +          # slope
-#   geom_ribbon(aes(x = pred.mm$x, ymin = pred.mm$predicted - pred.mm$std.error*1.96, ymax = pred.mm$predicted + pred.mm$std.error*1.96), 
-#               fill = "lightgrey", alpha = 0.5) +  # error band
-#   labs(x = "Wavelength (nm)", y = "Predicted D10-value (mJ/cm2)", 
-#        title = "Predicted D10-value with UV Wavelength from Infectivity Assays", colour = "Fomite Type") + 
-#   theme_minimal() +
-#   # scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
-#   #               labels = trans_format("log10", math_format(10^.x))) +
-#   theme(text = element_text(size = 13)) + annotate("text", label=paste0("p value = ", p_value), x=Inf, y=Inf, hjust = 1.5, vjust = 4)
-# 
-# plot
-# 
-# ggsave(paste0("figures_data/summary_figures/UV_wavelength_fomites_infectivity_predicted", ".png"), plot = plot, height = 7, width = 14)
-# ggsave(paste0("figures_data/summary_figures/UV_wavelength_fomites_molecular_predicted", ".png"), plot = plot, height = 7, width = 14)
-#
-# # plot(ggeffects::ggpredict(gam_UV), facets = TRUE)
-# # gratia::draw(gam_UV)
 
 
 ###################
 # Processing for pH
-
+# applicable to liquid mediums
+# Although pH was removed from the inclusion in the systematic review, a plotting subsection for it was built if useful
+                                              
 data <- filter(df, environmental_variables_cleaned == "pH" & !is.na(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`)) %>% select(covidence_id, setting, laboratory_methods, `data (temp/humidity/others)(times)(time_unit)(measurement_log_reduction)`, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, norovirus_types_cleaned_3)
 
 data <- mutate(data, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)` = strsplit(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, ","))
@@ -792,9 +573,6 @@ data <- mutate(data, D_value = as.numeric(gsub('\\)', '', D_value)))
 data <- mutate(data, lower_D = as.numeric(gsub('\\)', '', lower_D)))
 data <- mutate(data, higher_D = as.numeric(gsub('\\)', '', higher_D)))
 
-# data <- filter(data, laboratory_methods == "plaque assay")
-# data <- filter(data, laboratory_methods == "RT-qPCR" | laboratory_methods == "enzymatic treatment RT-qPCR")
-
 data <- mutate(data, assay_type = case_when(
   laboratory_methods == "plaque assay" | laboratory_methods == "TCID50" | laboratory_methods == "binding assay" ~ "Infectivity Assay",
   laboratory_methods == "RT-qPCR" ~ "Molecular Assay"))
@@ -836,7 +614,8 @@ ggsave(paste0("figures_data/summary_figures/pH_liquid_predicted", ".png"), plot 
 
 #########################
 # Processing for Radiance
-
+# applicable to liquid mediums. No sufficient data was available for plotting for fomite mediums
+                                              
 data <- filter(df, environmental_variables_cleaned == "radiance" & norovirus_variables_cleaned != "S90 (MJ m−2)" & !is.na(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`)) %>% select(covidence_id, setting, laboratory_methods, `data (temp/humidity/others)(times)(time_unit)(measurement_log_reduction)`, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, norovirus_types_cleaned_3)
 
 data <- mutate(data, `D-value (temp/humidity/others, D-value, lower D-value, higher D-value)` = strsplit(`D-value (temp/humidity/others, D-value, lower D-value, higher D-value)`, ","))
@@ -904,9 +683,6 @@ data <- mutate(data, D_value = as.numeric(gsub('\\)', '', D_value)))
 data <- mutate(data, lower_D = as.numeric(gsub('\\)', '', lower_D)))
 data <- mutate(data, higher_D = as.numeric(gsub('\\)', '', higher_D)))
 
-# data <- filter(data, laboratory_methods == "plaque assay")
-# data <- filter(data, laboratory_methods == "RT-qPCR" | laboratory_methods == "enzymatic treatment RT-qPCR")
-
 data <- mutate(data, assay_type = case_when(
   laboratory_methods == "plaque assay" ~ "Infectivity Assay",
   laboratory_methods == "RT-qPCR" | laboratory_methods == "extrapolated RT-qPCR" | laboratory_methods == "enzymatic treatment RT-qPCR" ~ "Molecular Assay"))
@@ -928,23 +704,15 @@ plot <- ggplot(data_new, aes(x=as.factor(radiance), y = D_value, fill = assay_ty
   theme_minimal() +
   geom_boxplot() + 
   geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-  labs(x = "Radiance", y = "D-value (days)", colour = "Type of Fomite", fill = "Type of Assay") + 
+  labs(x = "Radiance", y = "D-value (days)", colour = "Type of Medium", fill = "Type of Assay") + 
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
   theme(text = element_text(size = 15)) + scale_fill_grey(start = 0.5, end = 1) + theme(legend.position = "bottom", legend.direction = "vertical", legend.box = "horizontal") + guides(color = guide_legend(ncol = 2))
 
 plot
-
-plot <- plot + plot_annotation(title = "Figure 2. Impact of Radiance on Virus D-values in Liquid Solutions") & theme(plot.title = element_text(size = 18))
-
-plot
-
-
 
 summary <- data_new %>% group_by(assay_type, radiance, norovirus_types_cleaned_3) %>% summarize(mean = mean(D_value))
 
 ggsave(paste0("figures_data/summary_figures/radiance_liquid_predicted", ".png"), plot = plot, height = 9, width = 9)
 
 
-
-
-
+                                              
