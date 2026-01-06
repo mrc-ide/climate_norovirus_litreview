@@ -1,5 +1,5 @@
-install.packages("plan")
-install.packages("ggh4x")
+# the purpose of the script is to plot (1) the study characteristics, (2) numerical lower and upper boundaries of the exposure climate variable when available, (3) the size of the effect of the association
+# the script was built for epidemiological studies and not for the otuside-host ecological and laboratory associations described in the review
 
 library(dplyr)
 library(ggplot2)
@@ -16,6 +16,9 @@ df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Epi_community
 # Summary figure for studies of only good quality and "significant" or "not tested" significance levels for a selected environmental variable
 # Environmental variables (for ecological and epidemiological) can be "pH", "temperature", "radiance", "UV wavelength", "UV dose", "precipitation", "absolute humidity", "wind speed (and offshore versus onshore)", "atmospheric pressure", "soil moisture", "daytime hours", "relative humidity"
 # If adapting to laboratory studies, the environmental variables can additionally be "normal fluorescent light" and "dessication"
+
+##########################
+# Plotting for temperature
 
 epidemiological <- filter(df, (type_of_study_cleaned == "epidemiological") & ((environmental_boundary_lower != "na" & environmental_boundary_lower != "cold") | !is.na(standardised_relative_percent_change_of_odds_per_unit)) & (environmental_variables_cleaned == "ambient temperature" | environmental_variables_cleaned == "ambient temperature anomaly" | environmental_variables_cleaned == "water temperature") & `CASP TOTAL` != "POOR" & statistical_significance != "insignificant") %>%
                    select(first_author, year_of_article, country_and_region, norovirus_types_display, environmental_variables, environmental_boundary_lower, environmental_boundary_higher, direction_of_relationship, `CASP TOTAL`, statistical_significance, norovirus_variables_cleaned, setting, age_groups, standardised_relative_percent_change_of_odds_per_unit, standardised_relative_percent_change_per_unit_lower, standardised_relative_percent_change_per_unit_higher, standardised_linear_or_binary, coefficient_type, data_analysis_methods, coefficient)
@@ -69,8 +72,6 @@ plot1 <- ggplot(epidemiological, aes(reorder(plot_value, -order), boundary, colo
 
 plot1
 
-
-
 plot2 <- ggplot(data=epidemiological, aes(reorder(plot_value, -order), y = standardised_relative_percent_change_of_odds_per_unit, ymin = standardised_relative_percent_change_per_unit_lower, ymax = standardised_relative_percent_change_per_unit_higher, shape = coefficient_type)) +
         theme_minimal() +
         geom_pointrange() +
@@ -89,7 +90,6 @@ plot2 <- ggplot(data=epidemiological, aes(reorder(plot_value, -order), y = stand
         theme(text = element_text(size = 14))
 
 plot2
-
 
 epidemiological <- bind_rows(epidemiological, data.frame(reference = "Reference",
                              country_and_region = "Country", age_groups = "Age Group", norovirus_types_display = "Norovirus Type", environmental_variables = "Variable")) %>% 
@@ -117,6 +117,7 @@ plot0 <- ggplot(epidemiological, aes(y = reorder(plot_value, -order))) +
 
 plot0
 
+# if misaligned vertically, attempt to modify the t argument to 0, 1, 2, or 3 except for the first plot
 layout <- c(
   area(t = 0, l = 0, b = 30, r = 7), # left plot, starts at the top of the page (0) and goes 30 units down and 3 units to the right
   area(t = 2, l = 8, b = 30, r = 9), # middle plot starts a little lower (t=1) because there's no title. starts 1 unit right of the left plot (l=4, whereas left plot is r=3), goes to the bottom of the page (30 units), and 6 units further over from the left plot (r=9 whereas left plot is r=3)
@@ -132,12 +133,10 @@ plot
 # 
 # plot
 
-
 ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "temperature", ".png"), plot = plot, height = 10, width = 20)
 
-
-##################
-# Testing precipitation standardisation
+############################
+# Plotting for precipitation 
 
 # Studies of all qualities and significance levels
 epidemiological <- filter(df, (type_of_study_cleaned == "epidemiological") & (environmental_boundary_lower != "na" | !is.na(standardised_relative_percent_change_of_odds_per_unit)) & (environmental_variables_cleaned == "precipitation" | environmental_variables_cleaned == "precipitation anomaly") & `CASP TOTAL` != "POOR" & statistical_significance != "insignificant") %>%
@@ -160,8 +159,9 @@ epidemiological <- mutate(epidemiological, standardised_relative_percent_change_
 epidemiological <- mutate(epidemiological, standardised_relative_percent_change_per_unit_higher = as.numeric(standardised_relative_percent_change_per_unit_higher))
 
 epidemiological <- mutate(epidemiological, precipitation_standardisation_denominator = as.numeric(precipitation_standardisation_denominator))
-# epidemiological <- mutate(epidemiological, boundary = boundary/precipitation_standardisation_denominator)
 
+# If necessary to standardise the precipitation values by a time denominator to "amount of precipitation per day", uncomment below
+# epidemiological <- mutate(epidemiological, boundary = boundary/precipitation_standardisation_denominator)
 
 # specify what variables and groups the y-axis values will be composed of
 # the second plot_value_display is necessary in order to remove parts of the name that are not to be displayed, specifically direction_of_relationship
@@ -211,7 +211,6 @@ plot2 <- ggplot(data=epidemiological, aes(reorder(plot_value, -order), y=standar
 
 plot2
 
-
 epidemiological <- bind_rows(epidemiological, data.frame(reference = "Reference",
                                                          country_and_region = "Country", age_groups = "Age Group", norovirus_types_display = "Norovirus Type", environmental_variables = "Variable")) %>% 
   mutate(model = fct_rev(fct_relevel(reference, "Reference")))
@@ -241,9 +240,9 @@ plot0 <- ggplot(epidemiological, aes(y = reorder(plot_value, -order))) +
 # theme(legend.position = c(0.75, 0.1)) +
 # theme(text = element_text(size = 13))
 
-
 plot0
 
+# if misaligned vertically, attempt to modify the t argument to 0, 1, 2, or 3 except for the first plot
 layout <- c(
   area(t = -1, l = 0, b = 30, r = 7), # left plot, starts at the top of the page (0) and goes 30 units down and 3 units to the right
   area(t = 3, l = 8, b = 30, r = 9), # middle plot starts a little lower (t=1) because there's no title. starts 1 unit right of the left plot (l=4, whereas left plot is r=3), goes to the bottom of the page (30 units), and 6 units further over from the left plot (r=9 whereas left plot is r=3)
@@ -261,9 +260,9 @@ plot
 
 ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "precipitation", ".png"), plot = plot, height = 10, width = 20)
 
+#############################################################
+# Plotting for absolute and relative humidity and air pressure
 
-###################
-# Testing for absolute and relative humidity and air pressure
 # Studies of all qualities and significance levels
 epidemiological <- filter(df, (type_of_study_cleaned == "epidemiological") & (environmental_boundary_lower != "na" | !is.na(standardised_relative_percent_change_of_odds_per_unit)) & (environmental_variables_cleaned == "relative humidity" | environmental_variables_cleaned == "absolute humidity" | environmental_variables_cleaned == "atmospheric pressure" | environmental_variables_cleaned == "vapor pressure" | environmental_variables_cleaned == "atmospheric pressure deviation") & `CASP TOTAL` != "POOR" & statistical_significance != "insignificant") %>%
                    select(first_author, year_of_article, country_and_region, norovirus_types_display, environmental_variables, environmental_boundary_lower, environmental_boundary_higher, direction_of_relationship, `CASP TOTAL`, statistical_significance, norovirus_variables_cleaned, setting, precipitation_standardisation_denominator, age_groups, standardised_relative_percent_change_of_odds_per_unit, standardised_relative_percent_change_per_unit_lower, standardised_relative_percent_change_per_unit_higher, standardised_linear_or_binary, concomitant_conditions, coefficient_type, data_analysis_methods, coefficient, environmental_variables_cleaned)
@@ -324,7 +323,6 @@ plot1 <- ggplot(epidemiological, aes(reorder(plot_value, -order), boundary, colo
 
 plot1
 
-
 plot2 <- ggplot(data=epidemiological, aes(reorder(plot_value, -order), y=standardised_relative_percent_change_of_odds_per_unit, ymin=standardised_relative_percent_change_per_unit_lower, ymax=standardised_relative_percent_change_per_unit_higher, shape = coefficient_type)) +
   theme_minimal() +
   geom_pointrange() +
@@ -355,7 +353,6 @@ epidemiological$environmental_variables[epidemiological$environmental_variables 
 epidemiological$norovirus_types_display[epidemiological$norovirus_types_display == "Norovirus-associated gastroenteritis outbreaks"] <- "NoV-associated outbreaks"
 epidemiological$norovirus_types_display[epidemiological$norovirus_types_display == "NoV-associated gastroenteritis outbreaks"] <- "NoV-associated outbreaks"
 
-
 # https://www.khstats.com/blog/forest-plots/
 plot0 <- ggplot(epidemiological, aes(y = reorder(plot_value, -order))) +
   geom_text(aes(x = -0.3, label = reference), hjust = 0, fontface = ifelse(epidemiological$reference == "Reference", "bold", "plain")) +
@@ -375,12 +372,12 @@ plot0 <- ggplot(epidemiological, aes(y = reorder(plot_value, -order))) +
 
 plot0
 
+# if misaligned vertically, attempt to modify the t argument to 0, 1, 2, or 3 except for the first plot
 layout <- c(
   area(t = 0, l = 0, b = 30, r = 6), # left plot, starts at the top of the page (0) and goes 30 units down and 3 units to the right
   area(t = 1, l = 7, b = 30, r = 8), # middle plot starts a little lower (t=1) because there's no title. starts 1 unit right of the left plot (l=4, whereas left plot is r=3), goes to the bottom of the page (30 units), and 6 units further over from the left plot (r=9 whereas left plot is r=3)
   area(t = 1, l = 9, b = 30, r = 10) # right most plot starts at top of page, begins where middle plot ends (l=9, and middle plot is r=9), goes to bottom of page (b=30), and extends two units wide (r=11)
 )
-
 
 # final plot arrangement
 plot <- plot0 + plot1 + plot2 + plot_layout(design = layout)  # + plot_annotation(title = "Figure 2. Variability of Norovirus Burden Relative to Precipitation, Standardised Atmospheric Pressure, Absolute Humidity and Relative Humidity") & theme(plot.title = element_text(size = 18))
@@ -391,160 +388,7 @@ plot
 # 
 # plot
 
-
 ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "humidity_and_pressure", ".png"), plot = plot, height = 10, width = 20)
-
-
-# ########################################################
-# # Create figures for environmental variables of interest
-# # Environmental variables (for ecological and epidemiological) can be "pH", "temperature", "radiance", "UV wavelength", "UV dose", "precipitation", "absolute humidity", "wind speed (and offshore versus onshore)", "atmospheric pressure", "soil moisture", "daytime hours", "relative humidity"
-# # If adapting to laboratory studies, the environmental variables can additionally be "normal fluorescent light" and "dessication"
-# 
-# # Temperature
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "temperature", ".png"), plot = all_studies("temperature"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_", "temperature", ".png"), plot = good_studies("temperature"), height = 10, width = 20)
-# 
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "pH", ".png"), plot = all_studies("pH"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "radiance", ".png"), plot = all_studies("radiance"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "UV wavelength", ".png"), plot = all_studies("UV wavelength"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "UV dose", ".png"), plot = all_studies("UV dose"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "precipitation", ".png"), plot = all_studies("precipitation"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "absolute humidity", ".png"), plot = all_studies("absolute humidity"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "wind speed (and offshore versus onshore)", ".png"), plot = all_studies("wind speed (and offshore versus onshore)"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "atmospheric pressure", ".png"), plot = all_studies("atmospheric pressure"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "soil moisture", ".png"), plot = all_studies("soil moisture"), height = 10, width = 20)
-# ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "daytime hours", ".png"), plot = all_studies("daytime hours"), height = 10, width = 20)
-# 
-# 
-# 
-# #####################################
-# # Temperature new: instead of removing categorical variables, it is replacing them
-# 
-# epidemiological <- filter(df, (type_of_study_cleaned == "epidemiological" | type_of_study_cleaned == "ecological") & environmental_variables_cleaned == "temperature") %>%
-#   select(first_author, year_of_article, region_type_cleaned_2, norovirus_types_display, environmental_variables, environmental_boundary_lower, environmental_boundary_higher, direction_of_relationship, `CASP TOTAL`, statistical_significance, norovirus_variables_cleaned, setting, environmental_unit_type, data_analysis_methods)
-# 
-# epidemiological <- epidemiological %>% gather(key = boundary_type, value = boundary, -first_author, -region_type_cleaned_2, -norovirus_types_display, -direction_of_relationship, -`CASP TOTAL`, -statistical_significance, -environmental_variables, -year_of_article, -norovirus_variables_cleaned, -setting, -environmental_unit_type, -data_analysis_methods)
-# 
-# epidemiological <- unique(epidemiological)
-# 
-# # assign grouping based on whether the environmental variable boundaries are either categorical or quantitative
-# epidemiological <- mutate(epidemiological, environmental_unit_type = case_when(boundary == "na" | environmental_unit_type == "na" ~ "categorical",
-#                                                                                environmental_unit_type != "categorical" ~ "quantitative",
-#                                                                                TRUE ~ environmental_unit_type))
-# 
-# # replace categorical data with minimum and maximum
-# min <- as.character(min(as.numeric(epidemiological$boundary), na.rm=TRUE))
-# max <- as.character(max(as.numeric(epidemiological$boundary), na.rm=TRUE))
-#   
-# epidemiological <- mutate(epidemiological, boundary = case_when((boundary_type == "environmental_boundary_lower" & boundary == "na") |  boundary == "cold"  ~ min, 
-#                                                                 (boundary_type == "environmental_boundary_higher" & boundary == "na") |  boundary == "warm" ~ max, 
-#                                                                 TRUE ~ boundary))
-# 
-# remove(min, max)
-# 
-# epidemiological <- filter(epidemiological, direction_of_relationship != "na")
-# 
-# epidemiological <- mutate(epidemiological, boundary = as.numeric(boundary)) 
-# 
-# # specify what variables and groups the y-axis values will be composed of
-# # the second plot_value_display is necessary in order to remove parts of the name that are not to be displayed, specifically direction_of_relationship
-# epidemiological <- mutate(epidemiological, plot_value = paste(region_type_cleaned_2, first_author, year_of_article, norovirus_types_display, environmental_variables, direction_of_relationship, norovirus_variables_cleaned, setting, data_analysis_methods, sep = ", "))
-# epidemiological <- mutate(epidemiological, plot_value_display = paste(region_type_cleaned_2, first_author, year_of_article, norovirus_types_display, environmental_variables, sep = ", "))
-# 
-# # specify order
-# epidemiological <- epidemiological %>% group_by(environmental_unit_type, direction_of_relationship, region_type_cleaned_2, first_author, year_of_article) %>% arrange(desc(environmental_unit_type), direction_of_relationship, region_type_cleaned_2, boundary, `CASP TOTAL`) %>% ungroup()
-# 
-# order <- as.tibble(unique(epidemiological$plot_value)) %>% rename(plot_value = value) %>% mutate(order = 1:n()) 
-# epidemiological <- left_join(epidemiological, order, by = "plot_value") # %>% mutate(order = factor(order, levels = unique(order)))
-# remove(order)
-# 
-# epidemiological <- mutate(epidemiological, `CASP TOTAL` = case_when(`CASP TOTAL` == "GOOD" ~ "Good and Adequate", `CASP TOTAL` == "ADEQUATE" ~ "Good and Adequate", `CASP TOTAL` == "POOR" ~ "Poor"))
-# 
-# plot <- ggplot(epidemiological, aes(reorder(plot_value, -order), boundary, colour = direction_of_relationship, linetype = environmental_unit_type, alpha = `CASP TOTAL`)) + geom_line(linewidth = 2) +
-#   geom_text(data = epidemiological[epidemiological$statistical_significance=="significant" & epidemiological$boundary_type=="environmental_boundary_higher",], aes(label = "*"), nudge_y = 1, col="black", size=2)  +
-#   geom_text(data = epidemiological[epidemiological$statistical_significance=="insignificant" & epidemiological$boundary_type=="environmental_boundary_higher",], aes(label = "ns"), nudge_y = 1, col="black", size=2)  +
-#   geom_text(data = epidemiological[epidemiological$statistical_significance=="not tested" & epidemiological$boundary_type=="environmental_boundary_higher",], aes(label = "na"), nudge_y = 1, col="black", size=2)  +
-#   coord_flip() +
-#   scale_linetype_manual(values=c("dotted", "solid"))+
-#   labs(x = "Group", y = "Variable Boundaries", colour = "Directionality", alpha = "CASP", linetype = "Environmental variable type") +
-#   scale_x_discrete(labels = lapply(with(distinct(epidemiological, plot_value, .keep_all = TRUE), reorder(plot_value_display, -order)), as.character) %>% rev()) + # this line replaces the axis values with the desired ones (specifically, a shorter form). DOES NOT WORK WHEN FACETS ARE PRESENT
-#   ggtitle("Temperature") +
-#   facet_wrap(~factor(environmental_unit_type, c("quantitative", "categorical")), scales = "free_y", strip.position = "left", ncol = 1) + 
-#   theme(axis.text.y=element_text(size=6), legend.key.size = unit(1, 'cm')) +
-#   scale_alpha_discrete(range = c(1, 0.3)) +
-#   guides(alpha = guide_legend(override.aes = aes(label = ""))) # this line removes the "a" from the legend for the transparency
-# 
-# plot
-# 
-# ggsave(paste0("figures_data/summary_figures/summary_figure_categorical_test_", "temperature", ".png"), height = 10, width = 20)
-# 
-# 
-# 
-# 
-# ##############################################
-# # Testing figure for environmental variables other than temperature, converting everything to categorical
-# 
-# epidemiological <- filter(df, (type_of_study_cleaned == "epidemiological" | type_of_study_cleaned == "ecological") & environmental_variables_cleaned == "precipitation") %>%
-#   select(first_author, year_of_article, region_type_cleaned_2, norovirus_types_display, environmental_variables, environmental_boundary_lower, environmental_boundary_higher, direction_of_relationship, `CASP TOTAL`, statistical_significance, norovirus_variables_cleaned, setting, environmental_unit_type, data_analysis_methods)
-# 
-# epidemiological <- epidemiological %>% gather(key = boundary_type, value = boundary, -first_author, -region_type_cleaned_2, -norovirus_types_display, -direction_of_relationship, -`CASP TOTAL`, -statistical_significance, -environmental_variables, -year_of_article, -norovirus_variables_cleaned, -setting, -environmental_unit_type, -data_analysis_methods)
-# 
-# epidemiological <- unique(epidemiological)
-# 
-# # assign grouping based on whether the environmental variable boundaries are either categorical or quantitative
-# # This bit is not really necessary for other than temperature, but leaving it in in case can put everything in a function
-# epidemiological <- mutate(epidemiological, environmental_unit_type = case_when(boundary == "na" | environmental_unit_type == "na" ~ "categorical",
-#                                                                                environmental_unit_type != "categorical" ~ "quantitative",
-#                                                                                TRUE ~ environmental_unit_type))
-# 
-# epidemiological <- mutate(epidemiological, boundary = case_when((boundary_type == "environmental_boundary_lower" & boundary != "dry")  ~ "dry", 
-#                                                                 (boundary_type == "environmental_boundary_higher" & boundary != "wet") ~ "wet", 
-#                                                                 TRUE ~ boundary))
-# 
-# epidemiological <- mutate(epidemiological, boundary_2 = case_when((boundary == "dry")  ~ 0, 
-#                                                                   (boundary == "wet") ~ 10))
-# 
-# epidemiological <- filter(epidemiological, direction_of_relationship != "na")
-# 
-# # specify what variables and groups the y-axis values will be composed of
-# # the second plot_value_display is necessary in order to remove parts of the name that are not to be displayed, specifically direction_of_relationship
-# epidemiological <- mutate(epidemiological, plot_value = paste(region_type_cleaned_2, first_author, year_of_article, norovirus_types_display, environmental_variables, direction_of_relationship, norovirus_variables_cleaned, setting, data_analysis_methods, sep = ", "))
-# epidemiological <- mutate(epidemiological, plot_value_display = paste(region_type_cleaned_2, first_author, year_of_article, norovirus_types_display, environmental_variables, setting, sep = ", "))
-# 
-# # specify order
-# epidemiological <- epidemiological %>% group_by(direction_of_relationship, region_type_cleaned_2, first_author, year_of_article) %>% arrange(direction_of_relationship, region_type_cleaned_2, boundary, `CASP TOTAL`) %>% ungroup()
-# 
-# order <- as.tibble(unique(epidemiological$plot_value)) %>% rename(plot_value = value) %>% mutate(order = 1:n()) 
-# epidemiological <- left_join(epidemiological, order, by = "plot_value") # %>% mutate(order = factor(order, levels = unique(order)))
-# remove(order)
-# 
-# epidemiological <- mutate(epidemiological, `CASP TOTAL` = case_when(`CASP TOTAL` == "GOOD" ~ "Good and Adequate", `CASP TOTAL` == "ADEQUATE" ~ "Good and Adequate", `CASP TOTAL` == "POOR" ~ "Poor"))
-# 
-# options(repr.plot.width = 3, repr.plot.height =2)
-# 
-# plot <- ggplot(epidemiological, aes(reorder(plot_value, -order), boundary_2, colour = direction_of_relationship, alpha = `CASP TOTAL`)) + geom_line(linewidth = 1) + 
-#   geom_text(data = epidemiological[epidemiological$statistical_significance=="significant" & epidemiological$boundary_type=="environmental_boundary_higher",], aes(label = "*"), nudge_y = 0.2, col="black", size=2)  +
-#   geom_text(data = epidemiological[epidemiological$statistical_significance=="insignificant" & epidemiological$boundary_type=="environmental_boundary_higher",], aes(label = "ns"), nudge_y = 0.2, col="black", size=2)  +
-#   geom_text(data = epidemiological[epidemiological$statistical_significance=="not tested" & epidemiological$boundary_type=="environmental_boundary_higher",], aes(label = "na"), nudge_y = 0.2, col="black", size=2)  +
-#   coord_flip() +
-#   # scale_linetype_manual(values=c("dotted", "solid")) +
-#   labs(x = "Group", y = "Variable Boundaries", colour = "Directionality", alpha = "CASP", linetype = "Environmental variable type") +
-#   scale_x_discrete(labels = lapply(with(distinct(epidemiological, plot_value, .keep_all = TRUE), reorder(plot_value_display, -order)), as.character) %>% rev()) + # this line replaces the axis values with the desired ones (specifically, a shorter form). DOES NOT WORK WHEN FACETS ARE PRESENT
-#   scale_y_continuous(breaks = epidemiological$boundary_2, labels = epidemiological$boundary) +
-#   ggtitle("Precipitation") +
-#   # facet_wrap(~factor(environmental_unit_type, c("quantitative", "categorical")), scales = "free_y", strip.position = "left", ncol = 1) + 
-#   theme(axis.text.y=element_text(size=6), legend.key.size = unit(1, 'cm')) +
-#   scale_alpha_discrete(range = c(1, 0.3)) +
-#   guides(alpha = guide_legend(override.aes = aes(label = ""))) # this line removes the "a" from the legend for the transparency
-# 
-# plot
-# 
-# ggsave(paste0("figures_data/summary_figures/summary_figure_categorical_test_", "precipitation", ".png"), height = 10, width = 20)
-# 
-# 
-# 
-
-
 
 
 
