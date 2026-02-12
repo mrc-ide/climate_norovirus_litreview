@@ -5,7 +5,7 @@ library(ggplot2)
 library(openxlsx)
 
 #read data
-df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Data Detailed")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Data Detailed")
 
 df <- filter(df, environmental_variables != "pH")
 
@@ -91,5 +91,6 @@ summary <- df %>% select(covidence_id, type_of_study_cleaned, mechanism_of_influ
 writeData(wb, "study_mechanism_all", summary, startRow = 1, startCol = 1)
 
 saveWorkbook(wb, file = "figures_data/summary_statistics.xlsx", overwrite = TRUE)
+
 
 
