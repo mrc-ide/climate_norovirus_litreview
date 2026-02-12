@@ -7,7 +7,7 @@ library(plan)
 library(tidyverse)
 
 #read data
-df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Data Detailed")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Data Detailed")
 
 ##################################################################################
 count <- select(df, first_author, type_of_study_cleaned, norovirus_types)
@@ -40,5 +40,6 @@ plot <- ggplot(count, aes(x=norovirus_types_cleaned_3, y=count)) +
 plot
 
 ggsave("figures_data/studies_by_norovirus_types_cleaned_3.png", height = 10, width = 12)
+
 
 
