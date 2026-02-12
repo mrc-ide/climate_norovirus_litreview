@@ -11,7 +11,7 @@ library(cowplot)
 library(patchwork)
 
 #read data
-df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Epi_community_pri_sec_care")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Epi_community_pri_sec_care")
 
 # Summary figure for studies of only good quality and "significant" or "not tested" significance levels for a selected environmental variable
 # Environmental variables (for ecological and epidemiological) can be "pH", "temperature", "radiance", "UV wavelength", "UV dose", "precipitation", "absolute humidity", "wind speed (and offshore versus onshore)", "atmospheric pressure", "soil moisture", "daytime hours", "relative humidity"
@@ -389,6 +389,7 @@ plot
 # plot
 
 ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "humidity_and_pressure", ".png"), plot = plot, height = 10, width = 20)
+
 
 
 
