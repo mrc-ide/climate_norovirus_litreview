@@ -9,13 +9,13 @@ library(MetBrewer)
 library(scales)
 
 # read data
-df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Data General")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Data General")
 
 # remove pH due to this climate variables being excluded in the systematic review
 df <- filter(df, environmental_variables != "pH")
 
 # read data for multi-country studies (breakdown by country is essential for mapping)
-df_multi <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Breakdown of Multicountry")
+df_multi <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Breakdown of Multicountry")
 
 #================================================================================================================
 # quick plot of studies by year
@@ -97,5 +97,6 @@ g_world
 ggsave("figures_data/studies_by_country.png", height = 10, width = 12)
 
 world_map %>% ungroup() %>% select(region, study_count) %>% unique() %>% write.csv("figures_data/by_country_count.csv", row.names = FALSE)
+
 
 
