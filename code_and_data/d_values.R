@@ -18,9 +18,9 @@ library(ggeffects)
 library(patchwork)
 
 # read data and select one relevant sheet by uncommeting the command line if plotting for mediums that are (1) fomites, (2) liquid, (3) food
-# df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Lab_Fomites")
-# df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Lab_Liquid")
-# df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Lab_Food_Chain")
+# df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Lab_Fomites")
+# df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Lab_Liquid")
+# df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Lab_Food_Chain")
 
 # Plotting and processing is for each climate variable separately
 
@@ -718,4 +718,5 @@ ggsave(paste0("figures_data/summary_figures/radiance_liquid_predicted", ".png"),
 
 
                                               
+
 
