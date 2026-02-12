@@ -9,7 +9,7 @@ library(tidyverse)
 library(ggh4x)
 
 #read data
-df <- readxl::read_xlsx("Data extraction norovirus.xlsx", sheet = "Data Detailed")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Data Detailed")
 
 ##################
 # Function Section
@@ -247,6 +247,7 @@ plot <- ggplot(epidemiological, aes(reorder(plot_value, -order), boundary_2, col
 plot
 
 ggsave(paste0("figures_data/summary_figures/summary_figure_categorical_test_", "precipitation", ".png"), height = 10, width = 20)
+
 
 
 
