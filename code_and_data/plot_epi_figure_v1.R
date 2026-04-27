@@ -113,18 +113,18 @@ good_studies <- function(env_var){
 # Environmental variables (for ecological and epidemiological) can be "pH", "temperature", "radiance", "UV wavelength", "UV dose", "precipitation", "absolute humidity", "wind speed (and offshore versus onshore)", "atmospheric pressure", "soil moisture", "daytime hours", "relative humidity"
 # If adapting to laboratory studies, the environmental variables can additionally be "normal fluorescent light" and "dessication"
 
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "temperature", ".png"), plot = all_studies("temperature"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_", "temperature", ".png"), plot = good_studies("temperature"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "pH", ".png"), plot = all_studies("pH"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "radiance", ".png"), plot = all_studies("radiance"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "UV wavelength", ".png"), plot = all_studies("UV wavelength"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "UV dose", ".png"), plot = all_studies("UV dose"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "precipitation", ".png"), plot = all_studies("precipitation"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "absolute humidity", ".png"), plot = all_studies("absolute humidity"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "wind speed (and offshore versus onshore)", ".png"), plot = all_studies("wind speed (and offshore versus onshore)"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "atmospheric pressure", ".png"), plot = all_studies("atmospheric pressure"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "soil moisture", ".png"), plot = all_studies("soil moisture"), height = 10, width = 20)
-ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "daytime hours", ".png"), plot = all_studies("daytime hours"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "temperature", ".pdf"), plot = all_studies("temperature"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_", "temperature", ".pdf"), plot = good_studies("temperature"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "pH", ".pdf"), plot = all_studies("pH"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "radiance", ".pdf"), plot = all_studies("radiance"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "UV wavelength", ".pdf"), plot = all_studies("UV wavelength"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "UV dose", ".pdf"), plot = all_studies("UV dose"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "precipitation", ".pdf"), plot = all_studies("precipitation"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "absolute humidity", ".pdf"), plot = all_studies("absolute humidity"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "wind speed (and offshore versus onshore)", ".pdf"), plot = all_studies("wind speed (and offshore versus onshore)"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "atmospheric pressure", ".pdf"), plot = all_studies("atmospheric pressure"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "soil moisture", ".pdf"), plot = all_studies("soil moisture"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_all_studies_", "daytime hours", ".pdf"), plot = all_studies("daytime hours"), height = 10, width = 20)
 
 ############################################################################################################
 # New script developed only for temperature: instead of removing categorical variables, it is replacing them with an applicable value
@@ -185,7 +185,7 @@ plot <- ggplot(epidemiological, aes(reorder(plot_value, -order), boundary, colou
 
 plot
 
-ggsave(paste0("figures_data/summary_figures/summary_figure_categorical_test_", "temperature", ".png"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_categorical_test_", "temperature", ".pdf"), height = 10, width = 20)
 
 ########################################################################
 # Testing figure for precipitation, converting everything to categorical
@@ -246,7 +246,7 @@ plot <- ggplot(epidemiological, aes(reorder(plot_value, -order), boundary_2, col
 
 plot
 
-ggsave(paste0("figures_data/summary_figures/summary_figure_categorical_test_", "precipitation", ".png"), height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_categorical_test_", "precipitation", ".pdf"), height = 10, width = 20)
 
 
 
