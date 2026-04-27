@@ -9,13 +9,13 @@ library(MetBrewer)
 library(scales)
 
 # read data
-df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Data General")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Table S7")
 
 # remove pH due to this climate variables being excluded in the systematic review
 df <- filter(df, environmental_variables != "pH")
 
 # read data for multi-country studies (breakdown by country is essential for mapping)
-df_multi <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Breakdown of Multicountry")
+df_multi <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Table S8")
 
 #================================================================================================================
 # quick plot of studies by year
