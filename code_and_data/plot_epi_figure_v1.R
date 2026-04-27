@@ -9,7 +9,7 @@ library(tidyverse)
 library(ggh4x)
 
 #read data
-df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Data Detailed")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Table S9")
 
 ##################
 # Function Section
