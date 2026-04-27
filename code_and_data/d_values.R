@@ -159,13 +159,13 @@ plot <- ggplot(data_new, aes(x=as.factor(temp_box), y = D_value, fill = assay_ty
         theme_minimal() +
         geom_boxplot() +
         geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-        labs(x = "Temperature (°C)", y = "D-value (days)", colour = "Type of Fomite", fill = "Type of Assay") +
+        labs(x = "Temperature (°C)", y = "D-value (days)", colour = "Type of Virus and Fomite", fill = "Type of Assay") +
         scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
         theme(text = element_text(size = 17)) + scale_fill_grey(start = 0.5, end = 1) 
 
 plot
 
-ggsave(paste0("figures_data/summary_figures/temperature_fomites_predicted", ".png"), plot = plot, height = 7, width = 14)
+ggsave(paste0("figures_data/summary_figures/temperature_fomites_predicted", ".pdf"), plot = plot, height = 7, width = 14)
 
 ############################################                                                   
 # Run this when liquid mediums were selected 
@@ -195,14 +195,14 @@ plot <- ggplot(data_new, aes(x=as.factor(temp_box), y = D_value, fill = assay_ty
   theme_minimal() +
   geom_boxplot() + 
   geom_point(position=position_dodge(width = 0.75), aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3), fill = assay_type), size = 3) +
-  labs(x = "Temperature (°C)", y = "D-value (days)", colour = "Type of Fomite", fill = "Type of Assay") + 
+  labs(x = "Temperature (°C)", y = "D-value (days)", colour = "Type of Virus", fill = "Type of Assay") + 
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
   facet_wrap(~setting_new_type, strip.position = "left", ncol = 1, labeller = label_wrap_gen(width=25)) +
   theme(text = element_text(size = 17)) + scale_fill_grey(start = 0.5, end = 1) 
   
 plot
 
-ggsave(paste0("figures_data/summary_figures/temperature_liquid_predicted", ".png"), plot = plot, height = 7, width = 14)
+ggsave(paste0("figures_data/summary_figures/temperature_liquid_predicted", ".pdf"), plot = plot, height = 7, width = 14)
 
 ##########################################                                              
 # Run this when food mediums were selected 
@@ -230,14 +230,14 @@ plot <- ggplot(data_new, aes(x=as.factor(temp_box), y = D_value, fill = assay_ty
   theme_minimal() +
   geom_boxplot() + 
   geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3)), size = 3) +
-  labs(x = "Temperature (°C)", y = "D-value (days)", colour = "Type of Fomite", fill = "Type of Assay") + 
+  labs(x = "Temperature (°C)", y = "D-value (days)", colour = "Type of Virus", fill = "Type of Assay") + 
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
   facet_wrap(~setting_new_type, strip.position = "left", ncol = 1, labeller = label_wrap_gen(width=25)) +
   theme(text = element_text(size = 17)) + scale_fill_grey(start = 0.5, end = 1) 
 
 plot
 
-ggsave(paste0("figures_data/summary_figures/temperature_food_predicted", ".png"), plot = plot, height = 7, width = 14)
+ggsave(paste0("figures_data/summary_figures/temperature_food_predicted", ".pdf"), plot = plot, height = 7, width = 14)
 
 ###################
 ###################
@@ -345,13 +345,13 @@ plot <- ggplot(data_new, aes(x=as.factor(relative_humidity_box), y = D_value, fi
   theme_minimal() +
   geom_boxplot() + 
   geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-  labs(x = "Relative Humidity (%)", y = "D-value (days)", colour = "Type of Fomite", fill = "Type of Assay") + 
+  labs(x = "Relative Humidity (%)", y = "D-value (days)", colour = "Type of Virus and Fomite", fill = "Type of Assay") + 
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
   theme(text = element_text(size = 17)) + scale_fill_grey(start = 0.5, end = 1) 
 
 plot
 
-ggsave(paste0("figures_data/summary_figures/relative_humidity_fomites_predicted", ".png"), plot = plot, height = 7, width = 14)
+ggsave(paste0("figures_data/summary_figures/relative_humidity_fomites_predicted", ".pdf"), plot = plot, height = 7, width = 14)
 
 ########################
 ########################
@@ -455,13 +455,13 @@ plot <- ggplot(data_new, aes(x=as.factor(UV_wavelength_box), y = D_value, fill =
   theme_minimal() +
   geom_boxplot() + 
   geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-  labs(x = "Wavelength (nm)", y = "D10-value (mJ/cm2)", colour = "Type of Fomite", fill = "Type of Assay") + 
+  labs(x = "Wavelength (nm)", y = "D10-value (mJ/cm2)", colour = "Type of Virus and Fomite", fill = "Type of Assay") + 
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
   theme(text = element_text(size = 17)) + scale_fill_grey(start = 0.5, end = 1) 
 
 plot
 
-ggsave(paste0("figures_data/summary_figures/UV_wavelength_fomites_predicted", ".png"), plot = plot, height = 7, width = 14)
+ggsave(paste0("figures_data/summary_figures/UV_wavelength_fomites_predicted", ".pdf"), plot = plot, height = 7, width = 14)
 
 #####################################################
 # run this subsection for plotting for liquid mediums
@@ -491,8 +491,8 @@ data_new <- mutate(data_new, setting_new_type = case_when(
 plot <- ggplot(data_new, aes(x=as.factor(UV_wavelength_box), y = D_value, fill = assay_type)) +
   theme_minimal() +
   geom_boxplot() + 
-  geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3)), size = 3) +
-  labs(x = "Wavelength (nm)", y = "D10-value (mJ/cm2)", colour = "Type of Fomite", fill = "Type of Assay") + 
+  geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
+  labs(x = "Wavelength (nm)", y = "D10-value (mJ/cm2)", colour = "Type of Virus", fill = "Type of Assay") + 
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
   # facet_wrap(~setting_new_type, strip.position = "left", ncol = 1, labeller = label_wrap_gen(width=25)) +
   theme(text = element_text(size = 17)) + scale_fill_grey(start = 0.5, end = 1) 
@@ -501,7 +501,7 @@ plot
 
 summary <- data_new %>% group_by(assay_type, UV_wavelength_box, norovirus_types_cleaned_3) %>% summarize(mean = mean(D_value))
 
-ggsave(paste0("figures_data/summary_figures/UV_wavelength_liquid_predicted", ".png"), plot = plot, height = 7, width = 14)
+ggsave(paste0("figures_data/summary_figures/UV_wavelength_liquid_predicted", ".pdf"), plot = plot, height = 7, width = 14)
 
 
 ###################
@@ -603,7 +603,7 @@ plot <- ggplot(data_new, aes(x=as.factor(pH_box), y = D_value, fill = assay_type
   theme_minimal() +
   geom_boxplot() + 
   geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-  labs(x = "pH", y = "D-value (days)", colour = "Type of Fomite", fill = "Type of Assay") + 
+  labs(x = "pH", y = "D-value (days)", colour = "Type of Virus", fill = "Type of Assay") + 
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
   theme(text = element_text(size = 17)) + scale_fill_grey(start = 0.5, end = 1) 
 
@@ -611,7 +611,7 @@ plot
 
 summary <- data_new %>% group_by(assay_type, pH_box) %>% summarize(mean = mean(D_value))
 
-ggsave(paste0("figures_data/summary_figures/pH_liquid_predicted", ".png"), plot = plot, height = 7, width = 14)
+ggsave(paste0("figures_data/summary_figures/pH_liquid_predicted", ".pdf"), plot = plot, height = 7, width = 14)
 
 
 #########################
@@ -706,15 +706,15 @@ plot <- ggplot(data_new, aes(x=as.factor(radiance), y = D_value, fill = assay_ty
   theme_minimal() +
   geom_boxplot() + 
   geom_point(position=position_dodge(width=0.75),aes(group = assay_type, colour = paste(sep = " - ", data_new$norovirus_types_cleaned_3, data_new$setting)), size = 3) +
-  labs(x = "Radiance", y = "D-value (days)", colour = "Type of Medium", fill = "Type of Assay") + 
+  labs(x = "Radiance", y = "D-value (days)", colour = "Type of Virus and Medium", fill = "Type of Assay") + 
   scale_y_log10(breaks = scales::trans_breaks("log10", function(x) 10^x), labels = scales::trans_format("log10", scales::math_format(10^.x))) +
-  theme(text = element_text(size = 15)) + scale_fill_grey(start = 0.5, end = 1) + theme(legend.position = "bottom", legend.direction = "vertical", legend.box = "horizontal") + guides(color = guide_legend(ncol = 2))
+  theme(text = element_text(size = 15)) + scale_fill_grey(start = 0.5, end = 1) # + theme(legend.position = "bottom", legend.direction = "vertical", legend.box = "horizontal") + guides(color = guide_legend(ncol = 2))
 
 plot
 
 summary <- data_new %>% group_by(assay_type, radiance, norovirus_types_cleaned_3) %>% summarize(mean = mean(D_value))
 
-ggsave(paste0("figures_data/summary_figures/radiance_liquid_predicted", ".png"), plot = plot, height = 9, width = 9)
+ggsave(paste0("figures_data/summary_figures/radiance_liquid_predicted", ".pdf"), plot = plot, height = 9, width = 9)
 
 
                                               
