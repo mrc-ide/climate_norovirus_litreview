@@ -133,7 +133,7 @@ plot
 # 
 # plot
 
-ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "temperature", ".png"), plot = plot, height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "temperature", ".pdf"), plot = plot, height = 10, width = 20)
 
 ############################
 # Plotting for precipitation 
@@ -258,7 +258,7 @@ plot
 # 
 # plot
 
-ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "precipitation", ".png"), plot = plot, height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "precipitation", ".pdf"), plot = plot, height = 10, width = 20)
 
 #############################################################
 # Plotting for absolute and relative humidity and air pressure
@@ -388,7 +388,7 @@ plot
 # 
 # plot
 
-ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "humidity_and_pressure", ".png"), plot = plot, height = 10, width = 20)
+ggsave(paste0("figures_data/summary_figures/summary_figure_good_studies_RR_", "humidity_and_pressure", ".pdf"), plot = plot, height = 10, width = 20)
 
 
 
