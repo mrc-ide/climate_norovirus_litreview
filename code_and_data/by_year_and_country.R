@@ -33,7 +33,7 @@ df %>%
   theme(legend.position = "none", text = element_text(size = 18)) + 
   scale_y_continuous(breaks = pretty_breaks())
 
-ggsave("figures_data/studies_by_year.png", height = 10, width = 12)
+ggsave("figures_data/studies_by_year.pdf", height = 10, width = 12)
 
 #================================================================================================================
 # quick map of studies by country
@@ -94,7 +94,7 @@ g_world <- map_bg + geom_polygon(data = world_map %>%
 
 g_world
 
-ggsave("figures_data/studies_by_country.png", height = 10, width = 12)
+ggsave("figures_data/studies_by_country.pdf", height = 10, width = 12)
 
 world_map %>% ungroup() %>% select(region, study_count) %>% unique() %>% write.csv("figures_data/by_country_count.csv", row.names = FALSE)
 
