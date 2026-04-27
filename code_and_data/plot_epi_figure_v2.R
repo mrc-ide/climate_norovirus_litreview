@@ -11,7 +11,7 @@ library(cowplot)
 library(patchwork)
 
 #read data
-df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Epi_community_pri_sec_care")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Table S10")
 
 # Summary figure for studies of only good quality and "significant" or "not tested" significance levels for a selected environmental variable
 # Environmental variables (for ecological and epidemiological) can be "pH", "temperature", "radiance", "UV wavelength", "UV dose", "precipitation", "absolute humidity", "wind speed (and offshore versus onshore)", "atmospheric pressure", "soil moisture", "daytime hours", "relative humidity"
