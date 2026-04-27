@@ -7,7 +7,7 @@ library(plan)
 library(tidyverse)
 
 #read data
-df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Data Detailed")
+df <- readxl::read_xlsx("Supplementary Materials 3.xlsx", sheet = "Table S9")
 
 ##################################################################################
 count <- select(df, first_author, type_of_study_cleaned, norovirus_types)
