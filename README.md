@@ -1,1 +1,1 @@
-# Associations and mechanisms of influence between climate variables and norovirus seasonal incidence: a systematic review and meta-analysis
+# Associations and mechanisms of influence between climate variables and norovirus seasonal burden: an integrative review and meta-analysis of human and non-human studies
